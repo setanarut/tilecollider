@@ -1,6 +1,6 @@
 [![GoDoc](https://godoc.org/github.com/setanarut/tilecollider?status.svg)](https://pkg.go.dev/github.com/setanarut/tilecollider)
 
-# TileCollider
+# tilecollider
 
 A simple 2D tile-based collision detection package for Go.
 
