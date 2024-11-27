@@ -1,39 +1,23 @@
-# tilecollider
-Package tilecollider provides collision detection for tile-based games in Go language.
+[![GoDoc](https://godoc.org/github.com/setanarut/tilecollider?status.svg)](https://pkg.go.dev/github.com/setanarut/tilecollider)
 
-The method used is borrowed from [higherorderfun.com](http://higherorderfun.com/blog/2012/05/20/the-guide-to-implementing-2d-platformers/)
+# TileCollider
 
-## Algorithm
+A simple 2D tile-based collision detection package for Go.
 
-For movement in each axis (x, y):
- 1. We go from the tile coordinate of the leading edge of the movement to the tile coordinate of the destination of that edge.
- 2. We go from the base tile coordinate of the opposite axis to the max tile coordinate of the opposite axis.
- 3. For each of those tile coordinates `x` and `y`, we call the `OnCollision` callback. if it returns `true`, we've hit something and we stop checking that axis for collisions.
- 4. Returns movement delta after collision (actual position change)
+## Features
 
-## Example
+- Fast tile-based collision detection
+- Easy integration with game engines like Ebitengine
+- Generic tile map support with any Integer type [x][y]T
+- Support for non-square tiles (different width and height values)
+- Adaptive iteration count based on movement speed (anti-tunneling)
 
-```Go
-move := tilecollider.Collide(
-	&Offset, // collision detection grid offset
-	&GridSize, // collision detection grid size
-	&TileSize,
-	&Box, // player hit box
-	&Vel, // velocity
-	TileMap,
-	func(axis, direction int, tileID uint8, tileCoords [2]int) bool {
-		collidedTiles = append(collidedTiles, tileCoords)
-		if axis == 1 && direction == 1 {
-			IsOnFloor = true
-		}
-		if axis == 0 {
-			Vel[0] = 0
-		}
-		if axis == 1 && direction == -1 {
-			IsJumping = false
-			Vel[1] = 0
-		}
-		return true
-	})
-Translate(&Box, move)
+## Installation
+
+```sh
+go get github.com/setanarut/tilecollider
 ```
+
+## Usage
+
+See the [examples](./examples) directory for usage examples.
