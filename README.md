@@ -20,4 +20,10 @@ go get github.com/setanarut/tilecollider
 
 ## Usage
 
-See the [examples](./examples) directory for usage examples.
+See the [examples](./examples) directory for usage example.
+
+## Run Ebitengine example on your machine
+
+```sh
+go run github.com/setanarut/tilecollider/examples/ebitengine@latest
+```
