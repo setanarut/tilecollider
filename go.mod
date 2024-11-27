@@ -1,10 +1,8 @@
 module github.com/setanarut/tilecollider
 
-go 1.22.0
+go 1.23.2
 
-toolchain go1.23.2
-
-retract v1.0.0 // Contains bugs, use newer version
+retract [v1.0.0, v1.1.0] // Contains bugs, use newer version
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.8.5
