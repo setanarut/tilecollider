@@ -27,5 +27,5 @@ See the [examples](./examples) directory for usage example.
 ## Run Ebitengine example on your machine
 
 ```sh
-go run github.com/setanarut/tilecollider/examples/ebitengine@latest
+go run github.com/setanarut/tilecollider/examples/demo@latest
 ```
