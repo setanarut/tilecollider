@@ -45,11 +45,12 @@ func (c *Collider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, 
 		return moveX, moveY
 	}
 
-	if moveX != 0 {
+	if math.Abs(moveX) > math.Abs(moveY) { // Corner collisions unsticking mechanism
 		moveX = c.CollideX(rectX, rectY, rectW, rectH, moveX)
-	}
-	if moveY != 0 {
+		moveY = c.CollideY(rectX+moveX, rectY, rectW, rectH, moveY)
+	} else {
 		moveY = c.CollideY(rectX, rectY, rectW, rectH, moveY)
+		moveX = c.CollideX(rectX, rectY+moveY, rectW, rectH, moveX)
 	}
 
 	if onCollide != nil {

@@ -14,45 +14,42 @@ import (
 
 const (
 	screenWidth  = 400
-	screenHeight = 400
+	screenHeight = 200
 )
 
 var (
 	PlayerX = 0.
 	PlayerY = 0.
-	PlayerW = 48.
-	PlayerH = 48.
+	PlayerW = 50.
+	PlayerH = 50.
 
-	testVelX = 2.
-	testVelY = 2.
+	testVelX = 1.
+	testVelY = 1.
 
 	TileMap = [][]uint8{
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 1, 0, 0, 0, 0, 0},
-		{0, 0, 0, 1, 1, 0, 0, 0},
-		{0, 0, 0, 1, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 1, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
 	}
 
-	collider = tilecollider.NewCollider(TileMap, 48, 48)
+	collider = tilecollider.NewCollider(TileMap, 50, 50)
 )
 
 type Game struct {
 }
 
 func (g *Game) Update() error {
-	deltaX, deltaY := collider.Collide(
-		PlayerX,
-		PlayerY,
-		PlayerW,
-		PlayerH,
-		testVelX,
-		testVelY,
-		nil,
-	)
+	deltaX, deltaY := collider.Collide(PlayerX, PlayerY, PlayerW, PlayerH, testVelX, testVelY, nil)
+
+	fmt.Println(PlayerX, PlayerY)
+	if testVelX != deltaX {
+		fmt.Println("X COLLISION")
+	}
+	if testVelY != deltaY {
+		fmt.Println("Y COLLISION")
+	}
 
 	PlayerX += deltaX
 	PlayerY += deltaY
@@ -109,7 +106,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func main() {
-	ebiten.SetTPS(5)
+	// ebiten.SetTPS(12)
+
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
