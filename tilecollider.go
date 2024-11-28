@@ -17,17 +17,17 @@ type CollisionInfo[T Integer] struct {
 	Normal     [2]int // Normal vector of the collision (-1/0/1)
 }
 
-// TileCollider handles collision detection between rectangles and a 2D tilemap
-type TileCollider[T Integer] struct {
-	Collisions     []CollisionInfo[T] // List of collisions from last check
-	TileSize       [2]int             // Width and height of tiles
+// Collider handles collision detection between rectangles and a 2D tilemap
+type Collider[T Integer] struct {
 	TileMap        [][]T              // 2D grid of tile IDs
+	TileSize       [2]int             // Width and height of tiles
+	Collisions     []CollisionInfo[T] // List of collisions from last check
 	NonSolidTileID T                  // Sets the ID of non-solid tiles. Defaults to 0.
 }
 
-// NewTileCollider creates a new tile collider with the given tilemap and tile dimensions
-func NewTileCollider[T Integer](tileMap [][]T, tileWidth, tileHeight int) *TileCollider[T] {
-	return &TileCollider[T]{
+// NewCollider creates a new tile collider with the given tilemap and tile dimensions
+func NewCollider[T Integer](tileMap [][]T, tileWidth, tileHeight int) *Collider[T] {
+	return &Collider[T]{
 		TileMap:  tileMap,
 		TileSize: [2]int{tileWidth, tileHeight},
 	}
@@ -37,12 +37,20 @@ func NewTileCollider[T Integer](tileMap [][]T, tileWidth, tileHeight int) *TileC
 type CollisionCallback[T Integer] func([]CollisionInfo[T], float64, float64)
 
 // Collide checks for collisions when moving a rectangle and returns the allowed movement
-func (c *TileCollider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, onCollide CollisionCallback[T]) (float64, float64) {
-
+func (c *Collider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, onCollide CollisionCallback[T]) (float64, float64) {
 	c.Collisions = c.Collisions[:0]
 
-	moveX = c.CollideAxisX(rectX, rectY, rectW, rectH, moveX)
-	moveY = c.CollideAxisY(rectX, rectY, rectW, rectH, moveY)
+	if moveX == 0 && moveY == 0 {
+		return moveX, moveY
+	}
+
+	if moveX != 0 {
+		moveX = c.CollideX(rectX, rectY, rectW, rectH, moveX)
+	}
+
+	if moveY != 0 {
+		moveY = c.CollideY(rectX, rectY, rectW, rectH, moveY)
+	}
 
 	if onCollide != nil {
 		onCollide(c.Collisions, moveX, moveY)
@@ -51,8 +59,8 @@ func (c *TileCollider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float
 	return moveX, moveY
 }
 
-// CollideAxisX checks for collisions along the X axis and returns the allowed X movement
-func (c *TileCollider[T]) CollideAxisX(rectX, rectY, rectW, rectH, moveX float64) float64 {
+// CollideX checks for collisions along the X axis and returns the allowed X movement
+func (c *Collider[T]) CollideX(rectX, rectY, rectW, rectH, moveX float64) float64 {
 
 	checkLimit := max(1, int(math.Ceil(math.Abs(moveX)/float64(c.TileSize[0])))+1)
 
@@ -124,8 +132,8 @@ func (c *TileCollider[T]) CollideAxisX(rectX, rectY, rectW, rectH, moveX float64
 	return moveX
 }
 
-// CollideAxisY checks for collisions along the Y axis and returns the allowed Y movement
-func (c *TileCollider[T]) CollideAxisY(rectX, rectY, rectW, rectH, moveY float64) float64 {
+// CollideY checks for collisions along the Y axis and returns the allowed Y movement
+func (c *Collider[T]) CollideY(rectX, rectY, rectW, rectH, moveY float64) float64 {
 
 	checkLimit := max(1, int(math.Ceil(math.Abs(moveY)/float64(c.TileSize[1])))+1)
 	playerLeft := int(math.Floor(rectX / float64(c.TileSize[0])))

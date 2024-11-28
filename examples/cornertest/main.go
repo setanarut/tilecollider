@@ -13,54 +13,54 @@ import (
 )
 
 const (
-	screenWidth  = 640
-	screenHeight = 480
+	screenWidth  = 400
+	screenHeight = 400
 )
 
 var (
-	PlayerX = 140.
-	PlayerY = 130.
-	PlayerW = 140.
-	PlayerH = 20.
+	PlayerX = 0.
+	PlayerY = 0.
+	PlayerW = 48.
+	PlayerH = 48.
+
+	testVelX = 2.
+	testVelY = 2.
 
 	TileMap = [][]uint8{
-		{0, 0, 0, 0, 0, 0, 9, 1},
-		{0, 0, 0, 0, 0, 6, 0, 1},
-		{4, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 8, 0, 8, 3, 1},
-		{2, 0, 0, 0, 0, 0, 0, 0},
-		{1, 0, 0, 0, 0, 0, 0, 0},
-		{1, 0, 4, 0, 5, 0, 0, 0},
-		{1, 4, 2, 8, 1, 88, 13, 1},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 1, 0, 0, 0, 0, 0},
+		{0, 0, 0, 1, 1, 0, 0, 0},
+		{0, 0, 0, 1, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
 	}
 
-	collider = tilecollider.NewCollider(TileMap, screenWidth/8, screenHeight/8)
+	collider = tilecollider.NewCollider(TileMap, 48, 48)
 )
 
 type Game struct {
 }
 
 func (g *Game) Update() error {
-
-	// Get axis input
-	velX, velY := Axis()
-	velY *= 4
-	velX *= 4
-
-	// Collide with tiles
 	deltaX, deltaY := collider.Collide(
 		PlayerX,
 		PlayerY,
 		PlayerW,
 		PlayerH,
-		velX,
-		velY,
+		testVelX,
+		testVelY,
 		nil,
 	)
 
-	// Update player position
 	PlayerX += deltaX
 	PlayerY += deltaY
+
+	if PlayerX > screenWidth || PlayerY > screenHeight {
+		PlayerX = 0
+		PlayerY = 0
+	}
 
 	return nil
 }
@@ -109,6 +109,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func main() {
+	ebiten.SetTPS(4)
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
