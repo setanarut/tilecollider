@@ -19,9 +19,9 @@ type CollisionInfo[T Integer] struct {
 
 // Collider handles collision detection between rectangles and a 2D tilemap
 type Collider[T Integer] struct {
-	TileMap        [][]T              // 2D grid of tile IDs
-	TileSize       [2]int             // Width and height of tiles
 	Collisions     []CollisionInfo[T] // List of collisions from last check
+	TileSize       [2]int             // Width and height of tiles
+	TileMap        [][]T              // 2D grid of tile IDs
 	NonSolidTileID T                  // Sets the ID of non-solid tiles. Defaults to 0.
 }
 
@@ -38,6 +38,7 @@ type CollisionCallback[T Integer] func([]CollisionInfo[T], float64, float64)
 
 // Collide checks for collisions when moving a rectangle and returns the allowed movement
 func (c *Collider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, onCollide CollisionCallback[T]) (float64, float64) {
+
 	c.Collisions = c.Collisions[:0]
 
 	if moveX == 0 && moveY == 0 {
@@ -47,7 +48,6 @@ func (c *Collider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, 
 	if moveX != 0 {
 		moveX = c.CollideX(rectX, rectY, rectW, rectH, moveX)
 	}
-
 	if moveY != 0 {
 		moveY = c.CollideY(rectX, rectY, rectW, rectH, moveY)
 	}
@@ -84,9 +84,7 @@ func (c *Collider[T]) CollideX(rectX, rectY, rectW, rectH, moveX float64) float6
 					tileLeft := float64(x * c.TileSize[0])
 					collision := tileLeft - (rectX + rectW)
 					if collision <= moveX {
-						if collision < moveX {
-							moveX = collision
-						}
+						moveX = collision
 						c.Collisions = append(c.Collisions, CollisionInfo[T]{
 							TileID:     c.TileMap[y][x],
 							TileCoords: [2]int{x, y},
@@ -115,9 +113,7 @@ func (c *Collider[T]) CollideX(rectX, rectY, rectW, rectH, moveX float64) float6
 					tileRight := float64((x + 1) * c.TileSize[0])
 					collision := tileRight - rectX
 					if collision >= moveX {
-						if collision > moveX {
-							moveX = collision
-						}
+						moveX = collision
 						c.Collisions = append(c.Collisions, CollisionInfo[T]{
 							TileID:     c.TileMap[y][x],
 							TileCoords: [2]int{x, y},
@@ -156,9 +152,7 @@ func (c *Collider[T]) CollideY(rectX, rectY, rectW, rectH, moveY float64) float6
 					tileTop := float64(y * c.TileSize[1])
 					collision := tileTop - (rectY + rectH)
 					if collision <= moveY {
-						if collision < moveY {
-							moveY = collision
-						}
+						moveY = collision
 						c.Collisions = append(c.Collisions, CollisionInfo[T]{
 							TileID:     c.TileMap[y][x],
 							TileCoords: [2]int{x, y},
@@ -187,9 +181,7 @@ func (c *Collider[T]) CollideY(rectX, rectY, rectW, rectH, moveY float64) float6
 					tileBottom := float64((y + 1) * c.TileSize[1])
 					collision := tileBottom - rectY
 					if collision >= moveY {
-						if collision > moveY {
-							moveY = collision
-						}
+						moveY = collision
 						c.Collisions = append(c.Collisions, CollisionInfo[T]{
 							TileID:     c.TileMap[y][x],
 							TileCoords: [2]int{x, y},
