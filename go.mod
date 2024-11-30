@@ -2,7 +2,7 @@ module github.com/setanarut/tilecollider
 
 go 1.23.2
 
-retract [v1.0.0, v1.3.0] // corner collision sticking bug.
+retract [v1.0.0, v1.4.0] // several bugs
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.8.5

@@ -20,8 +20,8 @@ const (
 var (
 	PlayerX = 140.
 	PlayerY = 130.
-	PlayerW = 140.
-	PlayerH = 20.
+	PlayerW = 24.
+	PlayerH = 32.
 
 	TileMap = [][]uint8{
 		{0, 0, 0, 0, 0, 0, 9, 1},
@@ -44,8 +44,8 @@ func (g *Game) Update() error {
 
 	// Get axis input
 	velX, velY := Axis()
-	velY *= 4
-	velX *= 4
+	velY *= 0.333
+	velX *= 0.333
 
 	// Collide with tiles
 	deltaX, deltaY := collider.Collide(

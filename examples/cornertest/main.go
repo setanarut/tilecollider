@@ -43,7 +43,6 @@ type Game struct {
 func (g *Game) Update() error {
 	deltaX, deltaY := collider.Collide(PlayerX, PlayerY, PlayerW, PlayerH, testVelX, testVelY, nil)
 
-	fmt.Println(PlayerX, PlayerY)
 	if testVelX != deltaX {
 		fmt.Println("X COLLISION")
 	}
@@ -106,7 +105,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func main() {
-	// ebiten.SetTPS(12)
+	// ebiten.SetTPS(6)
 
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	if err := ebiten.RunGame(&Game{}); err != nil {
