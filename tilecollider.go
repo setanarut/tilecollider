@@ -71,20 +71,13 @@ func (c *Collider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, 
 // collideX checks for collisions along the X axis and returns the allowed X movement
 func (c *Collider[T]) collideX(rectX, rectY, rectW, rectH, moveX float64) float64 {
 
-	// Sadece konum ve boyut hesaplamalarında yuvarlama yap
-	posX := math.Round(rectX)
-	posY := math.Round(rectY)
-	width := math.Ceil(rectW)
-	height := math.Ceil(rectH)
-	// moveX'i yuvarlama!
-
 	checkLimit := max(1, int(math.Ceil(math.Abs(moveX)/float64(c.TileSize[0])))+1)
 
-	playerTop := int(math.Floor(posY / float64(c.TileSize[1])))
-	playerBottom := int(math.Ceil((posY+height)/float64(c.TileSize[1]))) - 1
+	playerTop := int(math.Floor(rectY / float64(c.TileSize[1])))
+	playerBottom := int(math.Ceil((rectY+rectH)/float64(c.TileSize[1]))) - 1
 
 	if moveX > 0 {
-		startX := int(math.Floor((posX + width) / float64(c.TileSize[0])))
+		startX := int(math.Floor((rectX + rectW) / float64(c.TileSize[0])))
 		endX := startX + checkLimit
 		endX = min(endX, len(c.TileMap[0]))
 
@@ -98,7 +91,7 @@ func (c *Collider[T]) collideX(rectX, rectY, rectW, rectH, moveX float64) float6
 				}
 				if c.TileMap[y][x] != c.NonSolidTileID {
 					tileLeft := float64(x * c.TileSize[0])
-					collision := tileLeft - (posX + width)
+					collision := tileLeft - (rectX + rectW)
 					if collision <= moveX {
 						moveX = collision
 						c.Collisions = append(c.Collisions, CollisionInfo[T]{
@@ -113,7 +106,7 @@ func (c *Collider[T]) collideX(rectX, rectY, rectW, rectH, moveX float64) float6
 	}
 
 	if moveX < 0 {
-		endX := int(math.Floor(posX / float64(c.TileSize[0])))
+		endX := int(math.Floor(rectX / float64(c.TileSize[0])))
 		startX := endX - checkLimit
 		startX = max(startX, 0)
 
@@ -127,7 +120,7 @@ func (c *Collider[T]) collideX(rectX, rectY, rectW, rectH, moveX float64) float6
 				}
 				if c.TileMap[y][x] != c.NonSolidTileID {
 					tileRight := float64((x + 1) * c.TileSize[0])
-					collision := tileRight - posX
+					collision := tileRight - rectX
 					if collision >= moveX {
 						moveX = collision
 						c.Collisions = append(c.Collisions, CollisionInfo[T]{
@@ -147,20 +140,13 @@ func (c *Collider[T]) collideX(rectX, rectY, rectW, rectH, moveX float64) float6
 // collideY checks for collisions along the Y axis and returns the allowed Y movement
 func (c *Collider[T]) collideY(rectX, rectY, rectW, rectH, moveY float64) float64 {
 
-	// Sadece konum ve boyut hesaplamalarında yuvarlama yap
-	posX := math.Round(rectX)
-	posY := math.Round(rectY)
-	width := math.Ceil(rectW)
-	height := math.Ceil(rectH)
-	// moveY'yi yuvarlama!
-
 	checkLimit := max(1, int(math.Ceil(math.Abs(moveY)/float64(c.TileSize[1])))+1)
 
-	playerLeft := int(math.Floor(posX / float64(c.TileSize[0])))
-	playerRight := int(math.Ceil((posX+width)/float64(c.TileSize[0]))) - 1
+	playerLeft := int(math.Floor(rectX / float64(c.TileSize[0])))
+	playerRight := int(math.Ceil((rectX+rectW)/float64(c.TileSize[0]))) - 1
 
 	if moveY > 0 {
-		startY := int(math.Floor((posY + height) / float64(c.TileSize[1])))
+		startY := int(math.Floor((rectY + rectH) / float64(c.TileSize[1])))
 		endY := startY + checkLimit
 		endY = min(endY, len(c.TileMap))
 
@@ -174,7 +160,7 @@ func (c *Collider[T]) collideY(rectX, rectY, rectW, rectH, moveY float64) float6
 				}
 				if c.TileMap[y][x] != c.NonSolidTileID {
 					tileTop := float64(y * c.TileSize[1])
-					collision := tileTop - (posY + height)
+					collision := tileTop - (rectY + rectH)
 					if collision <= moveY {
 						moveY = collision
 						c.Collisions = append(c.Collisions, CollisionInfo[T]{
@@ -189,7 +175,7 @@ func (c *Collider[T]) collideY(rectX, rectY, rectW, rectH, moveY float64) float6
 	}
 
 	if moveY < 0 {
-		endY := int(math.Floor(posY / float64(c.TileSize[1])))
+		endY := int(math.Floor(rectY / float64(c.TileSize[1])))
 		startY := endY - checkLimit
 		startY = max(startY, 0)
 
@@ -203,7 +189,7 @@ func (c *Collider[T]) collideY(rectX, rectY, rectW, rectH, moveY float64) float6
 				}
 				if c.TileMap[y][x] != c.NonSolidTileID {
 					tileBottom := float64((y + 1) * c.TileSize[1])
-					collision := tileBottom - posY
+					collision := tileBottom - rectY
 					if collision >= moveY {
 						moveY = collision
 						c.Collisions = append(c.Collisions, CollisionInfo[T]{
