@@ -47,17 +47,17 @@ func (c *Collider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, 
 
 	if math.Abs(moveX) > math.Abs(moveY) {
 		if moveX != 0 {
-			moveX = c.collideX(rectX, rectY, rectW, rectH, moveX)
+			moveX = c.CollideX(rectX, rectY, rectW, rectH, moveX)
 		}
 		if moveY != 0 {
-			moveY = c.collideY(rectX+moveX, rectY, rectW, rectH, moveY)
+			moveY = c.CollideY(rectX+moveX, rectY, rectW, rectH, moveY)
 		}
 	} else {
 		if moveY != 0 {
-			moveY = c.collideY(rectX, rectY, rectW, rectH, moveY)
+			moveY = c.CollideY(rectX, rectY, rectW, rectH, moveY)
 		}
 		if moveX != 0 {
-			moveX = c.collideX(rectX, rectY+moveY, rectW, rectH, moveX)
+			moveX = c.CollideX(rectX, rectY+moveY, rectW, rectH, moveX)
 		}
 	}
 
@@ -68,8 +68,8 @@ func (c *Collider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, 
 	return moveX, moveY
 }
 
-// collideX checks for collisions along the X axis and returns the allowed X movement
-func (c *Collider[T]) collideX(rectX, rectY, rectW, rectH, moveX float64) float64 {
+// CollideX checks for collisions along the X axis and returns the allowed X movement
+func (c *Collider[T]) CollideX(rectX, rectY, rectW, rectH, moveX float64) float64 {
 
 	checkLimit := max(1, int(math.Ceil(math.Abs(moveX)/float64(c.TileSize[0])))+1)
 
@@ -137,8 +137,8 @@ func (c *Collider[T]) collideX(rectX, rectY, rectW, rectH, moveX float64) float6
 	return moveX
 }
 
-// collideY checks for collisions along the Y axis and returns the allowed Y movement
-func (c *Collider[T]) collideY(rectX, rectY, rectW, rectH, moveY float64) float64 {
+// CollideY checks for collisions along the Y axis and returns the allowed Y movement
+func (c *Collider[T]) CollideY(rectX, rectY, rectW, rectH, moveY float64) float64 {
 
 	checkLimit := max(1, int(math.Ceil(math.Abs(moveY)/float64(c.TileSize[1])))+1)
 
