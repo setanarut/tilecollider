@@ -23,6 +23,7 @@ type Collider[T Integer] struct {
 	TileSize       [2]int             // Width and height of tiles
 	TileMap        [][]T              // 2D grid of tile IDs
 	NonSolidTileID T                  // Sets the ID of non-solid tiles. Defaults to 0.
+	StaticCheck    bool               // If true, always checks for static collisions. (no movement)
 }
 
 // NewCollider creates a new tile collider with the given tilemap and tile dimensions
@@ -42,7 +43,66 @@ func (c *Collider[T]) Collide(rectX, rectY, rectW, rectH, moveX, moveY float64, 
 	c.Collisions = c.Collisions[:0]
 
 	if moveX == 0 && moveY == 0 {
-		return moveX, moveY
+		if c.StaticCheck {
+			// Static collision test
+			playerTop := int(math.Floor(rectY / float64(c.TileSize[1])))
+			playerBottom := int(math.Ceil((rectY+rectH)/float64(c.TileSize[1]))) - 1
+			playerLeft := int(math.Floor(rectX / float64(c.TileSize[0])))
+			playerRight := int(math.Ceil((rectX+rectW)/float64(c.TileSize[0]))) - 1
+
+			minPenetration := math.MaxFloat64
+			var resolveX, resolveY float64
+
+			for y := playerTop; y <= playerBottom; y++ {
+				if y < 0 || y >= len(c.TileMap) {
+					continue
+				}
+				for x := playerLeft; x <= playerRight; x++ {
+					if x < 0 || x >= len(c.TileMap[0]) {
+						continue
+					}
+					if c.TileMap[y][x] != c.NonSolidTileID {
+						// Calculate overlap on each axis
+						tileLeft := float64(x * c.TileSize[0])
+						tileTop := float64(y * c.TileSize[1])
+
+						overlapX := min(rectX+rectW-tileLeft, tileLeft+float64(c.TileSize[0])-rectX)
+						overlapY := min(rectY+rectH-tileTop, tileTop+float64(c.TileSize[1])-rectY)
+
+						// Choose smallest penetration
+						if overlapX < overlapY && overlapX < minPenetration {
+							minPenetration = overlapX
+							if rectX+rectW/2 < tileLeft+float64(c.TileSize[0])/2 {
+								resolveX = -overlapX
+								resolveY = 0
+							} else {
+								resolveX = overlapX
+								resolveY = 0
+							}
+						} else if overlapY < minPenetration {
+							minPenetration = overlapY
+							if rectY+rectH/2 < tileTop+float64(c.TileSize[1])/2 {
+								resolveX = 0
+								resolveY = -overlapY
+							} else {
+								resolveX = 0
+								resolveY = overlapY
+							}
+						}
+
+						c.Collisions = append(c.Collisions, CollisionInfo[T]{
+							TileID:     c.TileMap[y][x],
+							TileCoords: [2]int{x, y},
+							Normal:     [2]int{int(math.Copysign(1, -resolveX)), int(math.Copysign(1, -resolveY))},
+						})
+					}
+				}
+			}
+
+			return resolveX, resolveY
+		} else {
+			return moveX, moveY
+		}
 	}
 
 	if math.Abs(moveX) > math.Abs(moveY) {

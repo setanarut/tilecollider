@@ -9,56 +9,60 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const (
-	screenWidth  = 640
-	screenHeight = 480
+	screenWidth  = 200
+	screenHeight = 200
 )
 
 var (
-	PlayerX = 140.
-	PlayerY = 130.
-	PlayerW = 24.
-	PlayerH = 32.
+	PlayerX = 20.
+	PlayerY = 20.
+	PlayerW = 50.
+	PlayerH = 50.
 
 	TileMap = [][]uint8{
-		{0, 0, 0, 0, 0, 0, 9, 1},
-		{0, 0, 0, 0, 0, 6, 0, 1},
-		{4, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 8, 0, 8, 3, 1},
-		{2, 0, 0, 0, 0, 0, 0, 0},
-		{1, 0, 0, 0, 0, 0, 0, 0},
-		{1, 0, 4, 0, 5, 0, 0, 0},
-		{1, 4, 2, 8, 1, 88, 13, 1},
+		{0, 0, 0, 0, 0},
+		{0, 1, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0},
 	}
 
-	collider = tilecollider.NewCollider(TileMap, screenWidth/8, screenHeight/8)
+	collider = tilecollider.NewCollider(TileMap, 50, 50)
 )
+
+func init() {
+	// Set the collider to always check for static collisions (no movement)
+	collider.StaticCheck = true
+}
 
 type Game struct {
 }
 
 func (g *Game) Update() error {
 
-	// Get input axis
-	velX, velY := Axis()
-	velY *= 3
-	velX *= 3
+	// Teleport player to mouse position
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		x, y := ebiten.CursorPosition()
+		PlayerX = float64(x)
+		PlayerY = float64(y)
+	}
+	// Toggle static check
+	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
+		collider.StaticCheck = !collider.StaticCheck
+	}
 
-	// Collide with tiles
-	deltaX, deltaY := collider.Collide(
-		PlayerX,
-		PlayerY,
-		PlayerW,
-		PlayerH,
-		velX,
-		velY,
-		nil,
-	)
+	// Collide with zero movement (teleport)
+	deltaX, deltaY := collider.Collide(PlayerX, PlayerY, PlayerW, PlayerH, 0, 0, nil)
 
-	// Update player position
+	if deltaX != 0 || deltaY != 0 {
+		collisionsLabel = fmt.Sprintf("Collision! %v", collider.Collisions)
+	}
+
 	PlayerX += deltaX
 	PlayerY += deltaY
 
@@ -91,42 +95,36 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		color.RGBA{47, 36, 254, 255},
 		false)
 
-	// Print collisions to the screen
-	for i, c := range collider.Collisions {
-		ebitenutil.DebugPrintAt(screen,
-			fmt.Sprintf(
-				"Tile ID: %d, Tile Coords: %v, Collision Normal: %v",
-				c.TileID,
-				c.TileCoords,
-				c.Normal,
-			), 20, 20+(i*20))
-	}
+	ebitenutil.DebugPrintAt(screen, collisionsLabel, 10, 10)
 
 }
+
+var collisionsLabel string
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
 }
 
 func main() {
+	// ebiten.SetTPS(6)
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func Axis() (x, y float64) {
+func Axis() (axisX, axisY float64) {
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		y -= 1
+		axisY -= 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		y += 1
+		axisY += 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		x -= 1
+		axisX -= 1
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		x += 1
+		axisX += 1
 	}
-	return
+	return axisX, axisY
 }
